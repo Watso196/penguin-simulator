@@ -13,7 +13,6 @@ config_version=5
 config/name="Penguin Project"
 run/main_scene="res://TestScene.tscn"
 config/features=PackedStringArray("4.1", "Forward Plus")
-config/icon="res://icon.svg"
 
 [rendering]
 

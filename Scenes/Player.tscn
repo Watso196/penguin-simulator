@@ -1,0 +1,66 @@
+[gd_scene load_steps=7 format=3 uid="uid://vq3e33fntluw"]
+
+[ext_resource type="Script" path="res://Scripts/Player.gd" id="1_if2w6"]
+[ext_resource type="Texture2D" uid="uid://c2an3fcrgskn8" path="res://Assets/Sprites/Penguin.png" id="2_kvkhc"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_fyy3t"]
+radius = 4.0
+height = 22.0
+
+[sub_resource type="Animation" id="Animation_4qb1q"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+
+[sub_resource type="Animation" id="Animation_g2227"]
+resource_name = "player_walk"
+length = 0.52
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.13, 0.26, 0.39),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_lc3yc"]
+_data = {
+"RESET": SubResource("Animation_4qb1q"),
+"player_walk": SubResource("Animation_g2227")
+}
+
+[node name="Player" type="CharacterBody2D"]
+script = ExtResource("1_if2w6")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 2)
+shape = SubResource("CapsuleShape2D_fyy3t")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_kvkhc")
+hframes = 4
+vframes = 2
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_lc3yc")
+}
+
+[node name="Camera2D" type="Camera2D" parent="."]
+zoom = Vector2(3, 3)
