@@ -1,11 +1,11 @@
-[gd_scene load_steps=7 format=3 uid="uid://vq3e33fntluw"]
+[gd_scene load_steps=12 format=3 uid="uid://vq3e33fntluw"]
 
 [ext_resource type="Script" path="res://Scripts/Player.gd" id="1_if2w6"]
 [ext_resource type="Texture2D" uid="uid://c2an3fcrgskn8" path="res://Assets/Sprites/Penguin.png" id="2_kvkhc"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_fyy3t"]
 radius = 4.0
-height = 22.0
+height = 24.0
 
 [sub_resource type="Animation" id="Animation_4qb1q"]
 length = 0.001
@@ -39,9 +39,93 @@ tracks/0/keys = {
 "values": [0, 1, 2, 3]
 }
 
+[sub_resource type="Animation" id="Animation_1ndc4"]
+resource_name = "player_start_slide"
+length = 0.6
+step = 0.01
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.0859, 0.1626, 0.2391, 0.3063, 0.5),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [0, 4, 5, 6, 7, 7]
+}
+
+[sub_resource type="Animation" id="Animation_nir6m"]
+resource_name = "player_standing_idle"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [0, 0]
+}
+
+[sub_resource type="Animation" id="Animation_6oumc"]
+resource_name = "player_sliding_idle"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.6),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [7, 7]
+}
+
+[sub_resource type="Animation" id="Animation_yxx2r"]
+resource_name = "player_jump"
+length = 0.35
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.3),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [8, 9, 10]
+}
+
+[sub_resource type="Animation" id="Animation_1qw5k"]
+resource_name = "player_stop_sliding"
+length = 0.4
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.118605, 0.225582, 0.288372),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [16, 17, 18, 19]
+}
+
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_lc3yc"]
 _data = {
 "RESET": SubResource("Animation_4qb1q"),
+"player_jump": SubResource("Animation_yxx2r"),
+"player_sliding_idle": SubResource("Animation_6oumc"),
+"player_standing_idle": SubResource("Animation_nir6m"),
+"player_start_slide": SubResource("Animation_1ndc4"),
+"player_stop_sliding": SubResource("Animation_1qw5k"),
 "player_walk": SubResource("Animation_g2227")
 }
 
@@ -49,13 +133,13 @@ _data = {
 script = ExtResource("1_if2w6")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0, 2)
+position = Vector2(0, 1)
 shape = SubResource("CapsuleShape2D_fyy3t")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("2_kvkhc")
 hframes = 4
-vframes = 2
+vframes = 5
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
