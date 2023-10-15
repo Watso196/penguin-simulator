@@ -9,12 +9,14 @@ var current_state : States = States.STANDING
 var walk_speed : float = 150
 var start_slide_speed : float = 60
 var gravity : float = 150.0
-var jump_speed : float = 150
+var jump_speed : float = 200
 # TODO need to check if player is in water tile eventually
 var is_in_water : bool = false
 var is_input_available : bool = true
 
 func _physics_process(delta: float) -> void:
+
+	print(States.keys()[current_state])
 
 	# Move us downward by gravity per second
 	velocity.y += gravity *  delta
@@ -79,8 +81,10 @@ func idle():
 	# Get the current state and determine the appropriate idle animation
 	var idle_anim : String
 	if current_state == States.SLIDING:
+		print("play sliding idle")
 		idle_anim = "player_sliding_idle"
 	else:
+		print("play standing idle")
 		idle_anim = "player_standing_idle"
 
 	_animation_player.play(idle_anim)
@@ -111,11 +115,10 @@ func change_state(new_state : States):
 	var prev_state : States = current_state
 	if new_state == States.STANDING:
 		if prev_state == States.SLIDING:
+			velocity.x = 0
 			_animation_player.play("player_stop_sliding")
 			await _animation_player.animation_finished
-			idle()
-		if prev_state == States.FALLING:
-			idle()
 
 	current_state = new_state
 	is_input_available = true
+	idle()
