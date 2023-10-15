@@ -15,9 +15,8 @@ var is_in_water : bool = false
 
 func _physics_process(delta: float) -> void:
 
-	if not is_on_floor():
-		# Move us downward by gravity per second
-		velocity.y += gravity *  delta
+	# Move us downward by gravity per second
+	velocity.y += gravity *  delta
 
 	if current_state == States.SLIDING:
 		velocity.x = lerp(velocity.x, 0.0, 0.05)
@@ -109,6 +108,8 @@ func change_state(new_state : States):
 		if prev_state == States.SLIDING:
 			_animation_player.play("player_stop_sliding")
 			await _animation_player.animation_finished
+			idle()
+		if prev_state == States.FALLING:
 			idle()
 	# Failover in case state doesn't have transition
 	current_state = new_state
