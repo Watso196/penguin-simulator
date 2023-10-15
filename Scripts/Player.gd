@@ -12,6 +12,7 @@ var gravity : float = 150.0
 var jump_speed : float = 150
 # TODO need to check if player is in water tile eventually
 var is_in_water : bool = false
+var is_input_available : bool = true
 
 func _physics_process(delta: float) -> void:
 
@@ -21,6 +22,7 @@ func _physics_process(delta: float) -> void:
 	if current_state == States.SLIDING:
 		velocity.x = lerp(velocity.x, 0.0, 0.05)
 		if velocity.x < 0.4 and velocity.x > -0.4:
+			is_input_available = false
 			velocity.x = 0
 			change_state(States.STANDING)
 
@@ -33,21 +35,22 @@ func _physics_process(delta: float) -> void:
 	elif !is_on_floor() and current_state != States.FALLING and current_state != States.SWIMMING:
 		change_state(States.FALLING)
 
-	# Position updates based on player input
-	if Input.is_action_pressed("ui_right"):
-		move(delta, false)
-	elif Input.is_action_pressed("ui_left"):
-		move(delta, true)
-	elif Input.is_action_just_released("ui_right") || Input.is_action_just_released("ui_left"):
-		velocity.x = 0
-		idle()
+	if is_input_available:
+		# Position updates based on player input
+		if Input.is_action_pressed("ui_right"):
+			move(delta, false)
+		elif Input.is_action_pressed("ui_left"):
+			move(delta, true)
+		elif (Input.is_action_just_released("ui_right") || Input.is_action_just_released("ui_left")) and current_state == States.STANDING:
+			velocity.x = 0
+			idle()
 
-	if Input.is_action_just_pressed("ui_up") and is_on_floor():
-		jump()
+		if Input.is_action_just_pressed("ui_up") and is_on_floor():
+			jump()
 
-	# Sliding can happen at multiple times regardless of movement so we check outside of our original loop
-	if Input.is_action_just_pressed("ui_select") and !is_in_water and (current_state == States.STANDING || current_state == States.SLIDING):
-		toggle_slide()
+		# Sliding can happen at multiple times regardless of movement so we check outside of our original loop
+		if Input.is_action_just_pressed("ui_select") and !is_in_water and (current_state == States.STANDING || current_state == States.SLIDING):
+			toggle_slide()
 
 	move_and_slide()
 
@@ -58,6 +61,8 @@ func move(delta : float, flip_sprite : bool):
 		swim(delta, flip_sprite)
 	elif current_state == States.FALLING:
 		#TODO need to figure out how being in the air changes movement
+		pass
+	else:
 		pass
 
 func walk(delta : float, flip_sprite : bool):
@@ -111,5 +116,6 @@ func change_state(new_state : States):
 			idle()
 		if prev_state == States.FALLING:
 			idle()
-	# Failover in case state doesn't have transition
+
 	current_state = new_state
+	is_input_available = true
