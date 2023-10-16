@@ -8,8 +8,9 @@ enum States { STANDING, FALLING, SLIDING, JUMPING, SWIMMING }
 var current_state : States = States.STANDING
 var walk_speed : float = 150
 var start_slide_speed : float = 60
+var fall_speed : float = 120
 var gravity : float = 150.0
-var jump_speed : float = 200
+var jump_speed : float = 75
 # TODO need to check if player is in water tile eventually
 var is_in_water : bool = false
 var is_input_available : bool = true
@@ -20,7 +21,6 @@ func _physics_process(delta: float) -> void:
 	velocity.y += gravity *  delta
 
 	# Get sprite flip state
-	print(velocity.x)
 	if velocity.x > 0:
 		sprite.flip_h = false
 	elif velocity.x < 0:
@@ -62,16 +62,13 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 
 func move(delta : float, direction : int = 1):
-	# TODO clean this up with a switch statement
-	if current_state == States.STANDING:
-		walk(delta, direction)
-	elif current_state == States.SWIMMING:
-		swim(delta, direction)
-	elif current_state == States.FALLING:
-		fall(delta, direction)
-		pass
-	else:
-		pass
+	match current_state:
+		States.STANDING:
+			walk(delta, direction)
+		States.SWIMMING:
+			swim(delta, direction)
+		States.FALLING:
+			fall(delta, direction)
 
 func walk(delta : float, direction : int = 1):
 	_animation_player.play("player_walk")
@@ -79,8 +76,7 @@ func walk(delta : float, direction : int = 1):
 	velocity.y += gravity * delta
 
 func fall(delta : float, direction : int = 1):
-	# TODO in the middle of figuring out how to get fall to work properly
-	velocity.x = lerp(0.0, walk_speed * direction, 0.2)
+	velocity.x = lerp(0.0, fall_speed * direction, 0.2)
 
 func swim(delta : float, direction : int = 1):
 	pass
@@ -98,7 +94,7 @@ func idle():
 
 func jump():
 	_animation_player.play("player_jump")
-	velocity.y = lerp(0.0, -jump_speed, 0.4)
+	velocity.y = -jump_speed
 
 func toggle_slide():
 	if current_state == States.STANDING:
@@ -116,11 +112,14 @@ func toggle_slide():
 func change_state(new_state : States):
 	var prev_state : States = current_state
 	if new_state == States.STANDING:
-		if prev_state == States.SLIDING:
-			velocity.x = 0
-			_animation_player.play("player_stop_sliding")
-			await _animation_player.animation_finished
+		match prev_state:
+			States.SLIDING:
+				velocity.x = 0
+				_animation_player.play("player_stop_sliding")
+				await _animation_player.animation_finished
+			States.FALLING:
+				velocity.x = 0
+				idle()
 
 	current_state = new_state
 	is_input_available = true
-	idle()
