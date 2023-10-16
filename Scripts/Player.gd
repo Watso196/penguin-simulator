@@ -16,10 +16,15 @@ var is_input_available : bool = true
 
 func _physics_process(delta: float) -> void:
 
-	print(States.keys()[current_state])
-
 	# Move us downward by gravity per second
 	velocity.y += gravity *  delta
+
+	# Get sprite flip state
+	print(velocity.x)
+	if velocity.x > 0:
+		sprite.flip_h = false
+	elif velocity.x < 0:
+		sprite.flip_h = true
 
 	if current_state == States.SLIDING:
 		velocity.x = lerp(velocity.x, 0.0, 0.05)
@@ -40,14 +45,14 @@ func _physics_process(delta: float) -> void:
 	if is_input_available:
 		# Position updates based on player input
 		if Input.is_action_pressed("ui_right"):
-			move(delta, false)
+			move(delta)
 		elif Input.is_action_pressed("ui_left"):
-			move(delta, true)
-		elif (Input.is_action_just_released("ui_right") || Input.is_action_just_released("ui_left")) and current_state == States.STANDING:
+			move(delta, -1)
+		elif (Input.is_action_just_released("ui_right") || Input.is_action_just_released("ui_left")) and (current_state == States.STANDING):
 			velocity.x = 0
 			idle()
 
-		if Input.is_action_just_pressed("ui_up") and is_on_floor():
+		if Input.is_action_just_pressed("ui_up") and current_state == States.STANDING:
 			jump()
 
 		# Sliding can happen at multiple times regardless of movement so we check outside of our original loop
@@ -56,35 +61,36 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 
-func move(delta : float, flip_sprite : bool):
+func move(delta : float, direction : int = 1):
+	# TODO clean this up with a switch statement
 	if current_state == States.STANDING:
-		walk(delta, flip_sprite)
+		walk(delta, direction)
 	elif current_state == States.SWIMMING:
-		swim(delta, flip_sprite)
+		swim(delta, direction)
 	elif current_state == States.FALLING:
-		#TODO need to figure out how being in the air changes movement
+		fall(delta, direction)
 		pass
 	else:
 		pass
 
-func walk(delta : float, flip_sprite : bool):
-	sprite.flip_h = flip_sprite
+func walk(delta : float, direction : int = 1):
 	_animation_player.play("player_walk")
-	velocity.x = lerp(0.0, walk_speed * (-1 if flip_sprite else 1), 0.2)
-#	velocity.x = walk_speed * (-1 if flip_sprite else 1)
+	velocity.x = lerp(0.0, walk_speed * direction, 0.2)
 	velocity.y += gravity * delta
 
-func swim(delta : float, flip_sprite : bool):
+func fall(delta : float, direction : int = 1):
+	# TODO in the middle of figuring out how to get fall to work properly
+	velocity.x = lerp(0.0, walk_speed * direction, 0.2)
+
+func swim(delta : float, direction : int = 1):
 	pass
 
 func idle():
 	# Get the current state and determine the appropriate idle animation
 	var idle_anim : String
 	if current_state == States.SLIDING:
-		print("play sliding idle")
 		idle_anim = "player_sliding_idle"
 	else:
-		print("play standing idle")
 		idle_anim = "player_standing_idle"
 
 	_animation_player.play(idle_anim)
@@ -105,10 +111,6 @@ func toggle_slide():
 
 	elif current_state == States.SLIDING:
 		change_state(States.STANDING)
-	pass
-
-# TODO need to update get_state to actually find appropriate state to use? do we need this?
-func get_state():
 	pass
 
 func change_state(new_state : States):
